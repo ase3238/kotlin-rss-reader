@@ -28,7 +28,7 @@ class PostModel {
         keyword: String,
     ) = postList.filter { it.title.contains(keyword) }
 
-    fun sortPostList(postList: List<Post>) = postList.sortedBy { it.pubDate }
+    fun sortPostList(postList: List<Post>) = postList.sortedByDescending { it.pubDate }
 
     fun cutPostList(
         postList: List<Post>,
