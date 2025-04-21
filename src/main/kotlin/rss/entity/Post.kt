@@ -2,7 +2,8 @@ package rss.entity
 
 import java.time.LocalDateTime
 
-class Post(
+data class Post(
     val title: String,
     val pubDate: LocalDateTime,
+    val link: String,
 )

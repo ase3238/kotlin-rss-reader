@@ -55,6 +55,7 @@ class PostModel {
         val children = item.childNodes
         var title = ""
         var date = now()
+        var link = ""
         for (i in 0 until children.length) {
             val child = children.item(i)
             when (child.nodeName) {
@@ -64,8 +65,9 @@ class PostModel {
                     val inputFormatter = DateTimeFormatter.RFC_1123_DATE_TIME.withLocale(Locale.ENGLISH)
                     date = LocalDateTime.parse(input, inputFormatter)
                 }
+                "link" -> link = child.textContent
             }
         }
-        return Post(title, date)
+        return Post(title, date, link)
     }
 }
