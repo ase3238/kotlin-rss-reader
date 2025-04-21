@@ -5,7 +5,6 @@ import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.runBlocking
 import org.w3c.dom.Node
 import rss.entity.Post
-import rss.entity.RSS_SOURCE
 import java.time.LocalDateTime
 import java.time.LocalDateTime.now
 import java.time.format.DateTimeFormatter
@@ -13,9 +12,9 @@ import java.util.Locale
 import javax.xml.parsers.DocumentBuilderFactory
 
 class PostModel {
-    fun initPostList(): List<Post> {
+    fun getPostList(rssSources: List<String>): List<Post> {
         return runBlocking {
-            RSS_SOURCE
+            rssSources
                 .map {
                     async { initPost(it) }
                 }
@@ -23,6 +22,8 @@ class PostModel {
                 .flatMap { it }
         }
     }
+
+    fun sortPostList(postList: List<Post>) = postList.sortedBy { it.pubDate }
 
     private fun initPost(source: String): MutableList<Post> {
         return runBlocking {
@@ -42,8 +43,8 @@ class PostModel {
 
     private fun parseItem(item: Node): Post {
         val children = item.childNodes
-        var title: String = ""
-        var date: LocalDateTime = now()
+        var title = ""
+        var date = now()
         for (i in 0 until children.length) {
             val child = children.item(i)
             when (child.nodeName) {
