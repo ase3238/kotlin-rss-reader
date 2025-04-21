@@ -23,7 +23,17 @@ class PostModel {
         }
     }
 
+    fun filterPostList(
+        postList: List<Post>,
+        keyword: String,
+    ) = postList.filter { it.title.contains(keyword) }
+
     fun sortPostList(postList: List<Post>) = postList.sortedBy { it.pubDate }
+
+    fun cutPostList(
+        postList: List<Post>,
+        size: Int,
+    ) = postList.take(size)
 
     private fun initPost(source: String): MutableList<Post> {
         return runBlocking {
