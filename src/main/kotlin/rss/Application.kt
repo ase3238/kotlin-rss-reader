@@ -8,5 +8,7 @@ fun main() {
     val model = PostModel()
     val view = PostView()
     val controller = PostController(model, view)
-    controller.runReader()
+    while (true) {
+        controller.runReader()
+    }
 }

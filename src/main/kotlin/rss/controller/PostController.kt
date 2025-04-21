@@ -13,6 +13,7 @@ class PostController(
         val posts = getPosts(RSS_SOURCE)
         postView.showKeywordMsg()
         val operated = operatedPosts(posts, readln())
+        postView.showPost(operated)
     }
 
     private fun getPosts(rssSource: List<String>): List<Post> {
