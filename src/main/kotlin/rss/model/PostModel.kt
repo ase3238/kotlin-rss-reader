@@ -3,12 +3,10 @@ package rss.model
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
-import org.w3c.dom.Node
+import org.w3c.dom.Element
 import rss.entity.Post
 import java.time.LocalDateTime
-import java.time.LocalDateTime.now
 import java.time.format.DateTimeFormatter
-import java.util.Locale
 import javax.xml.parsers.DocumentBuilderFactory
 
 class PostModel {
@@ -35,30 +33,20 @@ class PostModel {
         coroutineScope {
             val factory = DocumentBuilderFactory.newInstance()
             val xml = factory.newDocumentBuilder().parse(source)
-
-            val items = xml.getElementsByTagName("item")
-            (0 until items.length).map { i ->
-                async { parseItem(items.item(i)) }
-            }.awaitAll()
-        }
-
-    private fun parseItem(item: Node): Post {
-        val children = item.childNodes
-        var title = ""
-        var date = now()
-        var link = ""
-        for (i in 0 until children.length) {
-            val child = children.item(i)
-            when (child.nodeName) {
-                "title" -> title = child.textContent
-                "pubDate" -> {
-                    val input = child.textContent
-                    val inputFormatter = DateTimeFormatter.RFC_1123_DATE_TIME.withLocale(Locale.ENGLISH)
-                    date = LocalDateTime.parse(input, inputFormatter)
+            val channel = xml.getElementsByTagName("channel").item(0)
+            List(channel.childNodes.length) { channel.childNodes.item(it) }
+                .filterIsInstance<Element>()
+                .filter { it.tagName == "item" }
+                .map {
+                    Post(
+                        it.textOf("title"),
+                        LocalDateTime.parse(it.textOf("pubDate"), DateTimeFormatter.RFC_1123_DATE_TIME),
+                        it.textOf("link"),
+                    )
                 }
-                "link" -> link = child.textContent
-            }
         }
-        return Post(title, date, link)
+
+    private fun Element.textOf(tagName: String): String {
+        return getElementsByTagName(tagName).item(0)?.textContent.orEmpty()
     }
 }
