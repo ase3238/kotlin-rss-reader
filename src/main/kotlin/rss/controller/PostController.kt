@@ -50,7 +50,7 @@ class PostController(
                 postView.showNewPost(newPost)
             }
         }
-        return posts
+        return sortedPosts
     }
 
     private fun operatedPosts(
