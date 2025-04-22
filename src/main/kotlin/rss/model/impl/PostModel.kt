@@ -1,31 +1,32 @@
-package rss.model
+package rss.model.impl
 
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
 import org.w3c.dom.Element
 import rss.entity.Post
+import rss.model.PostPort
 import java.io.FileNotFoundException
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 import javax.xml.parsers.DocumentBuilderFactory
 
-class PostModel {
-    suspend fun getPostList(rssSources: List<String>): List<Post> =
+class PostModel : PostPort {
+    override suspend fun getPostList(rssSources: List<String>): List<Post> =
         coroutineScope {
             rssSources.map {
                 async { initPost(it) }
             }.awaitAll().flatten()
         }
 
-    fun filterPostList(
+    override fun filterPostList(
         postList: List<Post>,
         keyword: String,
     ) = postList.filter { it.title.contains(keyword) }
 
-    fun sortPostList(postList: List<Post>) = postList.sortedByDescending { it.pubDate }
+    override fun sortPostList(postList: List<Post>) = postList.sortedByDescending { it.pubDate }
 
-    fun cutPostList(
+    override fun cutPostList(
         postList: List<Post>,
         size: Int,
     ) = postList.take(size)

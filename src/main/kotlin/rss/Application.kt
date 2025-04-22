@@ -1,7 +1,7 @@
 package rss
 
 import rss.controller.PostController
-import rss.model.PostModel
+import rss.model.impl.PostModel
 import rss.view.PostView
 
 fun main() {

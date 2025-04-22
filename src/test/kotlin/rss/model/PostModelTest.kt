@@ -4,6 +4,7 @@ import io.kotest.core.spec.style.BehaviorSpec
 import io.kotest.matchers.comparables.shouldBeGreaterThan
 import io.kotest.matchers.shouldBe
 import rss.entity.RSS_SOURCE
+import rss.model.impl.PostModel
 
 class PostModelTest : BehaviorSpec({
 

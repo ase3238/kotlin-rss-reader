@@ -7,12 +7,12 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import rss.entity.Post
 import rss.entity.RSS_SOURCE
-import rss.model.PostModel
+import rss.model.PostPort
 import rss.view.PostView
 import java.time.Duration
 
 class PostController(
-    val postModel: PostModel,
+    val postModel: PostPort,
     val postView: PostView,
 ) {
     fun runReader() =
