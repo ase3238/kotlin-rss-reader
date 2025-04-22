@@ -5,6 +5,7 @@ import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
 import org.w3c.dom.Element
 import rss.entity.Post
+import java.io.FileNotFoundException
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 import javax.xml.parsers.DocumentBuilderFactory
@@ -31,12 +32,16 @@ class PostModel {
 
     private suspend fun initPost(source: String): List<Post> =
         coroutineScope {
-            val factory = DocumentBuilderFactory.newInstance()
-            val xml = factory.newDocumentBuilder().parse(source)
-            val items = xml.getElementsByTagName("item")
-            List(items.length) { items.item(it) }
-                .filterIsInstance<Element>()
-                .map { it.toPost() }
+            try {
+                val factory = DocumentBuilderFactory.newInstance()
+                val xml = factory.newDocumentBuilder().parse(source)
+                val items = xml.getElementsByTagName("item")
+                List(items.length) { items.item(it) }
+                    .filterIsInstance<Element>()
+                    .map { it.toPost() }
+            } catch (_: FileNotFoundException) {
+                emptyList()
+            }
         }
 
     private fun Element.toPost() =

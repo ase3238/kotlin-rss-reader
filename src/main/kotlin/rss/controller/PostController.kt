@@ -39,6 +39,9 @@ class PostController(
         oldPosts: List<Post>,
     ): List<Post> {
         val posts = postModel.getPostList(source)
+        if (oldPosts.size > posts.size) {
+            return oldPosts
+        }
         val sortedPosts = postModel.sortPostList(posts)
         if (oldPosts.isNotEmpty() && oldPosts[0].pubDate != sortedPosts[0].pubDate) {
             postView.showNewPostMsg()
