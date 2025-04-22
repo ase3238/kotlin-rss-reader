@@ -1,6 +1,5 @@
 package rss.controller
 
-import kotlinx.coroutines.runBlocking
 import rss.entity.Post
 import rss.entity.RSS_SOURCE
 import rss.model.PostModel
@@ -10,14 +9,12 @@ class PostController(
     val postModel: PostModel,
     val postView: PostView,
 ) {
-    fun runReader() {
-        runBlocking {
-            postView.showKeywordMsg()
-            val keyword = readln()
-            val posts = postModel.getPostList(RSS_SOURCE)
-            val operated = operatedPosts(posts, keyword)
-            postView.showPost(operated)
-        }
+    suspend fun runReader() {
+        val posts = postModel.getPostList(RSS_SOURCE)
+        postView.showKeywordMsg()
+        val keyword = readln()
+        val operated = operatedPosts(posts, keyword)
+        postView.showPost(operated)
     }
 
     private fun operatedPosts(

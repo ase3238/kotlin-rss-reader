@@ -1,8 +1,9 @@
 package rss.model
 
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
-import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.withContext
 import org.w3c.dom.Element
 import rss.entity.Post
 import java.time.LocalDateTime
@@ -11,7 +12,7 @@ import javax.xml.parsers.DocumentBuilderFactory
 
 class PostModel {
     suspend fun getPostList(rssSources: List<String>): List<Post> =
-        coroutineScope {
+        withContext(Dispatchers.IO) {
             rssSources.map {
                 async { initPost(it) }
             }.awaitAll().flatten()
@@ -29,22 +30,21 @@ class PostModel {
         size: Int,
     ) = postList.take(size)
 
-    private suspend fun initPost(source: String): List<Post> =
-        coroutineScope {
-            val factory = DocumentBuilderFactory.newInstance()
-            val xml = factory.newDocumentBuilder().parse(source)
-            val channel = xml.getElementsByTagName("channel").item(0)
-            List(channel.childNodes.length) { channel.childNodes.item(it) }
-                .filterIsInstance<Element>()
-                .filter { it.tagName == "item" }
-                .map {
-                    Post(
-                        it.textOf("title"),
-                        LocalDateTime.parse(it.textOf("pubDate"), DateTimeFormatter.RFC_1123_DATE_TIME),
-                        it.textOf("link"),
-                    )
-                }
-        }
+    private fun initPost(source: String): List<Post> {
+        val factory = DocumentBuilderFactory.newInstance()
+        val xml = factory.newDocumentBuilder().parse(source)
+        val items = xml.getElementsByTagName("item")
+        return List(items.length) { items.item(it) }
+            .filterIsInstance<Element>()
+            .map { it.toPost() }
+    }
+
+    private fun Element.toPost() =
+        Post(
+            this.textOf("title"),
+            LocalDateTime.parse(this.textOf("pubDate"), DateTimeFormatter.RFC_1123_DATE_TIME),
+            this.textOf("link"),
+        )
 
     private fun Element.textOf(tagName: String): String {
         return getElementsByTagName(tagName).item(0)?.textContent.orEmpty()
