@@ -1,10 +1,8 @@
 package rss.model
 
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
-import kotlinx.coroutines.withContext
 import org.w3c.dom.Element
 import rss.entity.Post
 import java.time.LocalDateTime
@@ -13,7 +11,7 @@ import javax.xml.parsers.DocumentBuilderFactory
 
 class PostModel {
     suspend fun getPostList(rssSources: List<String>): List<Post> =
-        withContext(Dispatchers.IO) {
+        coroutineScope {
             rssSources.map {
                 async { initPost(it) }
             }.awaitAll().flatten()
