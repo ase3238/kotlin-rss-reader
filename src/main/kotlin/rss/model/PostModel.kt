@@ -3,6 +3,7 @@ package rss.model
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.withContext
 import org.w3c.dom.Element
 import rss.entity.Post
@@ -30,14 +31,15 @@ class PostModel {
         size: Int,
     ) = postList.take(size)
 
-    private fun initPost(source: String): List<Post> {
-        val factory = DocumentBuilderFactory.newInstance()
-        val xml = factory.newDocumentBuilder().parse(source)
-        val items = xml.getElementsByTagName("item")
-        return List(items.length) { items.item(it) }
-            .filterIsInstance<Element>()
-            .map { it.toPost() }
-    }
+    private suspend fun initPost(source: String): List<Post> =
+        coroutineScope {
+            val factory = DocumentBuilderFactory.newInstance()
+            val xml = factory.newDocumentBuilder().parse(source)
+            val items = xml.getElementsByTagName("item")
+            List(items.length) { items.item(it) }
+                .filterIsInstance<Element>()
+                .map { it.toPost() }
+        }
 
     private fun Element.toPost() =
         Post(
